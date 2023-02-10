@@ -1,3 +1,6 @@
+import json
+import os.path
+
 import matplotlib
 import scienceplots
 from sklearn import neighbors
@@ -51,16 +54,17 @@ def run_classify(X_train, X_test, Y_train, Y_test):
     # svm.SVC() -> decision_function
     # tree.DecisionTreeClassifier(criterion='entropy') -> predict_proba
     # ensemble.RandomForestClassifier() -> predict_proba -> AP结果过高
+    # linear_model.LogisticRegression(solver='lbfgs', max_iter=1000) -> predict_proba
 
-    classifier = OneVsRestClassifier(svm.SVC())
+    classifier = OneVsRestClassifier(neighbors.KNeighborsClassifier(n_neighbors=3))
     classifier.fit(X_train, Y_train)
-    y_score = classifier.decision_function(X_test)
-    # y_score = classifier.predict_proba(X_test)
+    # y_score = classifier.decision_function(X_test)
+    y_score = classifier.predict_proba(X_test)
     y_predict = classifier.predict(X_test)
     return y_score, y_predict
 
 
-def draw_PR(recall_micro, precision_micro, ap_all_micro,is_save,save_path):
+def draw_PR(recall_micro, precision_micro, ap_all_micro, is_save, save_path):
     matplotlib.rcParams['axes.unicode_minus'] = False
     # 'notebook', 'std-colors' 'science', 'no-latex' ,'bright', 'high-vis' 'grid','light
     # 'muted'
@@ -94,10 +98,16 @@ df_report = pd.DataFrame(report).transpose()
 df_report['AP'] = 0
 for key in ap.keys():
     df_report.loc[key, 'AP'] = ap[key]
-df_report.loc['micro avg', 'AP']=ap_all_micro
-df_report.loc['macro avg', 'AP']=ap_all_macro
-df_report.loc['weighted avg', 'AP']=ap_all_weighted
-df_report.loc['samples avg', 'AP']=ap_all_samples
+df_report.loc['micro avg', 'AP'] = ap_all_micro
+df_report.loc['macro avg', 'AP'] = ap_all_macro
+df_report.loc['weighted avg', 'AP'] = ap_all_weighted
+df_report.loc['samples avg', 'AP'] = ap_all_samples
 # save
-df_report.to_csv('./test_result/test_report.csv', sep=',', encoding='utf_8_sig')
-draw_PR(recall_micro,precision_micro,ap_all_micro,True,'./test_result/test_pr.jpg')
+net = 'knn_3'
+if not os.path.exists(f'./{net}_result'):
+    os.makedirs(f'./{net}_result')
+df_report.to_csv(f'./{net}_result/{net}_report.csv', sep=',', encoding='utf_8_sig')
+# 多个数组保存到一个文件，前面是数组名，等号后面是数组
+np.savez(f'./{net}_result/{net}_pr_curve.npz', recall_micro=recall_micro, precision_micro=precision_micro,
+         ap_all_micro=ap_all_micro)
+draw_PR(recall_micro, precision_micro, ap_all_micro, True, f'./{net}_result/{net}_pr.jpg')

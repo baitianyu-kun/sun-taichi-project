@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="2fd29f4e-f5c9-4e84-8084-74badb1e1db6" name="XidianVLANGAO">
+        <fileTransfer rootFolder="/home/gzg" accessType="SFTP" host="192.168.192.212" port="22" sshConfigId="cdcf756d-21a9-466b-8ca7-b6e28506d2e1" sshConfig="gzg@192.168.192.212:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
